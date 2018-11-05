@@ -54,22 +54,23 @@ mkdir -p /srv/gitlab/config /srv/gitlab/data /srv/gitlab/logs && \
 
 cd /srv/gitlab/
 nano docker-compose.yml 
-# web:
-#   image: 'gitlab/gitlab-ce:latest'
-#   restart: always
-#   hostname: 'gitlab.example.com'
-#   environment:
-#     GITLAB_OMNIBUS_CONFIG: |
-#       external_url 'http://instace-ip'
-#   ports:
-#     - '80:80'
-#     - '443:443'
-#     - '2222:22'
-#   volumes:
-#     - '/srv/gitlab/config:/etc/gitlab'
-#     - '/srv/gitlab/logs:/var/log/gitlab'
-#     - '/srv/gitlab/data:/var/opt/gitlab'
-#    ##
+web:
+  image: 'gitlab/gitlab-ce:latest'
+  restart: always
+  hostname: 'gitlab.example.com'
+  environment:
+    GITLAB_OMNIBUS_CONFIG: |
+      external_url 'http://instace-ip'
+  ports:
+    - '80:80'
+    - '443:443'
+    - '2222:22'
+  volumes:
+    - '/srv/gitlab/config:/etc/gitlab'
+    - '/srv/gitlab/logs:/var/log/gitlab'
+    - '/srv/gitlab/data:/var/opt/gitlab'
+
+
 
 docker-compose up -d
 
@@ -85,37 +86,26 @@ gitlab/gitlab-runner:latest
 
 docker exec -it gitlab-runner gitlab-runner register
 
-## Runtime platform                                    arch=amd64 os=linux pid=11 revision=cf91d5e1 version=11.4.2
-## Running in system-mode.                            
-##                                                    
-## Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.com/):
-
+Runtime platform                                    arch=amd64 os=linux pid=11 revision=cf91d5e1 version=11.4.2
+Running in system-mode.                            
+Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.com/):
 http://<instance-ip>/
-
-## Please enter the gitlab-ci token for this runner:
-
+Please enter the gitlab-ci token for this runner:
 <token>
-
-## Please enter the gitlab-ci description for this runner:
-## [518bffb75c7f]: my-runner
-## Please enter the gitlab-ci tags for this runner (comma separated):
-
+Please enter the gitlab-ci description for this runner:
+[518bffb75c7f]: my-runner
+Please enter the gitlab-ci tags for this runner (comma separated):
 linux,xenial,ubuntu,docker
-
-## Registering runner... succeeded                     runner=1Z8ziaMK
-## Please enter the executor: parallels, shell, virtualbox, docker+machine, docker-ssh+machine, kubernetes, docker, docker-ssh, ssh:
-
+Registering runner... succeeded                     runner=1Z8ziaMK
+Please enter the executor: parallels, shell, virtualbox, docker+machine, docker-ssh+machine, kubernetes, docker, docker-ssh, ssh:
 docker
-
-## Please enter the default Docker image (e.g. ruby:2.1):
-
+Please enter the default Docker image (e.g. ruby:2.1):
 alpine:latest
+Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded! 
 
-## Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded! 
+Не забыть натыкать в вебинтерфейсе, что runner может "Run untagged jobs"  и не "Lock to current projects"
 
-### Не забыть натыкать в вебинтерфейсе, что runner может "Run untagged jobs"  и не "Lock to current projects"
-
-6) добавляем приложение reddit в репозиторий
+7) добавляем приложение reddit в репозиторий
 git clone https://github.com/express42/reddit.git && rm -rf ./reddit/.git
 git add reddit/
 git commit -m "Add reddit app"
@@ -123,25 +113,25 @@ git push gitlab gitlab-ci-1
 
 ### не забыть добавить gem 'rack-test' в reddit/Gemfile
 ### не забыть добавить в reddit/simpletest.rb
-# require_relative './app'
-# require 'test/unit'
-# require 'rack/test'
-# 
-# set :environment, :test
-# 
-# class MyAppTest < Test::Unit::TestCase
-#   include Rack::Test::Methods
-# 
-#   def app
-#     Sinatra::Application
-#   end
-# 
-#   def test_get_request
-#     get '/'
-#     assert last_response.ok?
-#   end
-# end
-# 
+require_relative './app'
+require 'test/unit'
+require 'rack/test'
+
+set :environment, :test
+
+class MyAppTest < Test::Unit::TestCase
+  include Rack::Test::Methods
+
+  def app
+    Sinatra::Application
+  end
+
+  def test_get_request
+    get '/'
+    assert last_response.ok?
+  end
+end
+
 
 ## после этого еще раз:
 git add reddit/
@@ -150,7 +140,7 @@ git push gitlab gitlab-ci-1
 
 Как проверить работоспособность:
 
-http://<instace-ip>/homework/example/pipelines
+- В адресной строке браузера перейти по http://<instace-ip>/homework/example/pipelines
 
 ##############################################################################
 
