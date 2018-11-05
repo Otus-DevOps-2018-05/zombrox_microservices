@@ -13,6 +13,7 @@ Homework #16
 Как запустить проект:
 
 1) Создать истанс в GCP для сервера gitlab
+```
 gcloud compute instances create gitlab-ci \
 --project=docker-zombrox \
 --boot-disk-size=100GB \
@@ -23,27 +24,29 @@ gcloud compute instances create gitlab-ci \
 --restart-on-failure \
 --zone europe-west1-d
 #--metadata-from-file startup-script=startUp.sh
-
+```
 2) разрешить подключение к серверу по HTTP/HTTPS
-
+```
 gcloud compute firewall-rules create gitlab-ci-http \
 --direction=in \
 --action=allow \
 --target-tags=gitlab-ci \
 --source-ranges=0.0.0.0/0 \
 --rules=tcp:80
-
+```
+```
 gcloud compute firewall-rules create gitlab-ci-https \
 --direction=in \
 --action=allow \
 --target-tags=gitlab-ci \
 --source-ranges=0.0.0.0/0 \
 --rules=tcp:443
-
+```
 3) Подключиться к созданному инстансу
-ssh appuser@<instance-ip> -i .ssh/appuser
+`ssh appuser@<instance-ip> -i .ssh/appuser`
 
 4) На инстансе выполнить от sudo -i
+```
 apt-get update && \
 apt-get upgrade -y && \
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - && \
@@ -51,8 +54,8 @@ add-apt-repository "deb https://download.docker.com/linux/ubuntu $(lsb_release -
 apt-get update && \
 apt-get install docker-ce docker-compose -y && \
 mkdir -p /srv/gitlab/config /srv/gitlab/data /srv/gitlab/logs && \
-
-cd /srv/gitlab/
+```
+`cd /srv/gitlab/`
 nano docker-compose.yml
 ```
 web:
@@ -108,13 +111,15 @@ Runner registered successfully. Feel free to start it, but if it's running alrea
 Не забыть натыкать в вебинтерфейсе, что runner может "Run untagged jobs"  и не "Lock to current projects"
 
 7) добавляем приложение reddit в репозиторий
+```
 git clone https://github.com/express42/reddit.git && rm -rf ./reddit/.git
 git add reddit/
 git commit -m "Add reddit app"
 git push gitlab gitlab-ci-1
+````
 
-### не забыть добавить gem 'rack-test' в reddit/Gemfile
-### не забыть добавить в reddit/simpletest.rb
+не забыть добавить gem `'rack-test'` в reddit/Gemfile
+не забыть добавить в reddit/simpletest.rb
 ```
 require_relative './app'
 require 'test/unit'
@@ -136,7 +141,7 @@ class MyAppTest < Test::Unit::TestCase
 end
 
 ```
-## после этого еще раз:
+после этого еще раз:
 ```
 git add reddit/
 git commit -m "Add reddit app with tests"
