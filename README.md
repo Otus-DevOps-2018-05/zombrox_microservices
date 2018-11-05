@@ -134,6 +134,7 @@ git push gitlab gitlab-ci-1
 ````
 
 не забыть добавить gem `'rack-test'` в reddit/Gemfile
+
 не забыть добавить в reddit/simpletest.rb
 ```
 require_relative './app'
