@@ -56,7 +56,8 @@ apt-get install docker-ce docker-compose -y && \
 mkdir -p /srv/gitlab/config /srv/gitlab/data /srv/gitlab/logs && \
 ```
 `cd /srv/gitlab/`
-nano docker-compose.yml
+
+`nano docker-compose.yml`
 ```
 web:
   image: 'gitlab/gitlab-ce:latest'
@@ -81,11 +82,12 @@ web:
 ###
 
 5) Запуск Runner
+```
 docker run -d --name gitlab-runner --restart always \
 -v /srv/gitlab-runner/config:/etc/gitlab-runner \
 -v /var/run/docker.sock:/var/run/docker.sock \
 gitlab/gitlab-runner:latest
-
+```
 6) Регистрация Runner
 
 `docker exec -it gitlab-runner gitlab-runner register`
@@ -94,21 +96,34 @@ gitlab/gitlab-runner:latest
 Runtime platform                                    arch=amd64 os=linux pid=11 revision=cf91d5e1 version=11.4.2
 Running in system-mode.                            
 Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.com/):
+```
 `http://<instance-ip>/`
+```
 Please enter the gitlab-ci token for this runner:
+```
 `<token>`
+```
 Please enter the gitlab-ci description for this runner:
-[518bffb75c7f]: `my-runner`
+[518bffb75c7f]: 
+```
+`my-runner`
+```
 Please enter the gitlab-ci tags for this runner (comma separated):
+```
 `linux,xenial,ubuntu,docker`
+```
 Registering runner... succeeded                     runner=1Z8ziaMK
 Please enter the executor: parallels, shell, virtualbox, docker+machine, docker-ssh+machine, kubernetes, docker, docker-ssh, ssh:
+```
 `docker`
+```
 Please enter the default Docker image (e.g. ruby:2.1):
+```
 `alpine:latest`
+```
 Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded! 
 ```
-Не забыть натыкать в вебинтерфейсе, что runner может "Run untagged jobs"  и не "Lock to current projects"
+Не забыть натыкать в вебинтерфейсе, что runner может `Run untagged jobs`  и не `Lock to current projects`
 
 7) добавляем приложение reddit в репозиторий
 ```
