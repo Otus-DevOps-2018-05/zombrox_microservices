@@ -47,7 +47,7 @@ branch review:
     url: http://$CI_ENVIRONMENT_SLUG.example.com
   only:
     - branches
-  exept:
+  except:
     - master
 
 staging:
