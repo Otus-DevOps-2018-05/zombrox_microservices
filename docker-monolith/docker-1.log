@@ -1,4 +1,0 @@
-REPOSITORY                TAG                 IMAGE ID            CREATED             SIZE
-zombrox/ubuntu-tmp-file   latest              e16f31927d27        18 seconds ago      115MB
-ubuntu                    16.04               52b10959e8aa        8 days ago          115MB
-hello-world               latest              2cb0d9787c4d        7 weeks ago         1.85kB
