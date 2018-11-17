@@ -7,10 +7,6 @@ Homework #19
 -
 
 Как запустить проект:
-0)
-gcloud compute firewall-rules create cadvisor-default --allow tcp:9090
-gcloud compute firewall-rules create grafana-default --allow tcp:3000
-gcloud compute firewall-rules create alertmanager-default --allow tcp:9093
 
 1) Создадим Docker host
 
@@ -35,20 +31,26 @@ docker-host
 `cd monitoring/alertmanager/`
 `docker build -t $USER_NAME/alertmanager .`
 
-3) Запустим сервисы
+3) Добавляем необходимые правила файрвола
+
+`gcloud compute firewall-rules create cadvisor-default --allow tcp:9090`
+`gcloud compute firewall-rules create grafana-default --allow tcp:3000`
+`gcloud compute firewall-rules create alertmanager-default --allow tcp:9093`
+
+4) Запустим сервисы
 `cd src/` 
 `docker-compose up -d`
 `docker-compose -f docker-compose-monitoring.yml up -d`
 
-4) Добавляем в Grafana Data Sources
+5) Добавляем в Grafana Data Sources
 `http://docker-host-ip:3000/datasources/new`
 Используем при этом `http://prometheus:9090` как URL
 
-5) импортируем Dashboards из `monitoring/grafana/dashboards/`
+6) импортируем Dashboards из `monitoring/grafana/dashboards/`
 `http://docker-host-ip:3000/dashboard/import`
 необходимо будет указать Prometheus Server (единственный в выпадающем списке)
 
-6) Пушим собранные образы на DockerHub
+7) Пушим собранные образы на DockerHub
 `docker login`
 Login Succeeded
 `docker push $USER_NAME/ui`
