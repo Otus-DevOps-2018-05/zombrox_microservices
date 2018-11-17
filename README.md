@@ -1,16 +1,70 @@
 # zombrox_microservices
 zombrox microservices repository
 
-Homework #18
+Homework #19
 
 Что сделано :
 -
 
 Как запустить проект:
--
+0)
+gcloud compute firewall-rules create cadvisor-default --allow tcp:9090
+gcloud compute firewall-rules create grafana-default --allow tcp:3000
+gcloud compute firewall-rules create alertmanager-default --allow tcp:9093
+
+1) Создадим Docker host
+
+`export GOOGLE_PROJECT=docker-zombrox`
+```
+docker-machine create --driver google \
+--google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
+--google-machine-type n1-standard-1 \
+--google-zone asia-east2-a \
+docker-host
+```
+`eval $(docker-machine env docker-host)`
+`docker-machine ip docker-host` - получаем ip адрес docker-host
+
+2) Собираем Docker образы с Prometheus и Alertmanager
+
+`export USER_NAME=zombrox`
+
+`cd monitoring/prometheus/`
+`docker build -t $USER_NAME/prometheus .`
+
+`cd monitoring/alertmanager/`
+`docker build -t $USER_NAME/alertmanager .`
+
+3) Запустим сервисы
+`cd src/` 
+`docker-compose up -d`
+`docker-compose -f docker-compose-monitoring.yml up -d`
+
+4) Добавляем в Grafana Data Sources
+`http://docker-host-ip:3000/datasources/new`
+Используем при этом `http://prometheus:9090` как URL
+
+5) импортируем Dashboards из `monitoring/grafana/dashboards/`
+`http://docker-host-ip:3000/dashboard/import`
+необходимо будет указать Prometheus Server (единственный в выпадающем списке)
+
+6) Пушим собранные образы на DockerHub
+`docker login`
+Login Succeeded
+`docker push $USER_NAME/ui`
+`docker push $USER_NAME/comment`
+`docker push $USER_NAME/post`
+`docker push $USER_NAME/prometheus`
+`docker push $USER_NAME/alertmanager`
+
 
 Как проверить работоспособность:
--
+-  В адресной строке браузера перейти по:
+`http://docker-host-ip-address-in-GCP:9292` - для перехода к Prometheus
+`http://docker-host-ip-address-in-GCP:9090` - для перехода к Reddit
+`http://docker-host-ip-address-in-GCP:3000` - для перехода к Grafana
+`http://docker-host-ip-address-in-GCP:9093` - для перехода к Alertmanager
+`http://docker-host-ip-address-in-GCP:8080` - для перехода к cAdvisor
 
 ##############################################################################
 
