@@ -68,8 +68,8 @@ Login Succeeded
 
 Как проверить работоспособность:
 -  В адресной строке браузера перейти по:
-`http://docker-host-ip-address-in-GCP:9292` - для перехода к Prometheus
-`http://docker-host-ip-address-in-GCP:9090` - для перехода к Reddit
+`http://docker-host-ip-address-in-GCP:9292` - для перехода к Redit
+`http://docker-host-ip-address-in-GCP:9090` - для перехода к Prometheus
 `http://docker-host-ip-address-in-GCP:3000` - для перехода к Grafana
 `http://docker-host-ip-address-in-GCP:9093` - для перехода к Alertmanager
 `http://docker-host-ip-address-in-GCP:8080` - для перехода к cAdvisor
