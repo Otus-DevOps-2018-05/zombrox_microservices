@@ -4,18 +4,23 @@ zombrox microservices repository
 Homework #20
 
 Что сделано :
--
-for i in ui post-py comment; do cd src/$i; bash docker_build.sh; cd -; done
+- Cоздан отдельный compose-файл для компонентов EFK.
+- Создан образ контейнера с fluentd.
+- Пересобраны образы контейнеров с обновленным кодом Reddit.
+- В конфигурацию fluentd добавлены фильтры для работы со сруктурированными и не структрурированными логами.
+
 
 
 Как запустить проект:
-1 )
+1 ) Соберем образы микросевисов приложения с обновленным кодом
+`export USER_NAME=zombrox`
 `for i in ui comment; do cd src/$i; bash docker_build.sh && docker push $USER_NAME/$i; cd -; done`
 `for i in post; do cd src/post-py; bash docker_build.sh && docker push $USER_NAME/$i; cd -; done`
 
-2)
-export GOOGLE_PROJECT=docker-zombrox
+2) Создадим docker-host
+`export GOOGLE_PROJECT=docker-zombrox`
 
+```
 docker-machine create --driver google \
 --google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
 --google-machine-type n1-standard-1 \
@@ -23,32 +28,29 @@ docker-machine create --driver google \
 --google-open-port 9292/tcp \
 --google-open-port 9411/tcp \
 logging
+```
+`eval $(docker-machine env logging)`
 
-eval $(docker-machine env logging)
-
-docker-machine ip logging
+`docker-machine ip logging` - узнаем ip адрес docker-host
 
 `docker-machine ssh logging sudo sysctl -w vm.max_map_count=262144` - без этой опции не работает elasticsearch
 
-3)
-export USER_NAME=zombrox
-cd logging/fluentd/
-docker build -t $USER_NAME/fluentd .
+3)Соберем образ с fluentd
+`export USER_NAME=zombrox`
+`cd logging/fluentd/`
+`docker build -t $USER_NAME/fluentd .`
 
-3.5)
-
-docker-compose -f docker-compose-logging.yml up -d
-
-4)
-cd src/
-docker-compose up -d
-docker-compose logs -f post 
-
-
+4)Запустим микросервисы EFK и reddit
+`cd docker/`
+`docker-compose -f docker-compose-logging.yml up -d`
+`docker-compose up -d`
 
 Как проверить работоспособность:
--
+-  В адресной строке браузера перейти по:
+`http://docker-host-ip-address-in-GCP:9292` - для перехода к Reddit
+`http://docker-host-ip-address-in-GCP:5601` - для перехода к Kibana
 
+`docker-compose logs -f <container-name>` - посмотреть логи в контейнере
 
 ##############################################################################
 
@@ -119,8 +121,8 @@ Login Succeeded
 
 Как проверить работоспособность:
 -  В адресной строке браузера перейти по:
-`http://docker-host-ip-address-in-GCP:9292` - для перехода к Prometheus
-`http://docker-host-ip-address-in-GCP:9090` - для перехода к Reddit
+`http://docker-host-ip-address-in-GCP:9292` - для перехода к Reddit
+`http://docker-host-ip-address-in-GCP:9090` - для перехода к Prometheus
 `http://docker-host-ip-address-in-GCP:3000` - для перехода к Grafana
 `http://docker-host-ip-address-in-GCP:9093` - для перехода к Alertmanager
 `http://docker-host-ip-address-in-GCP:8080` - для перехода к cAdvisor
@@ -188,8 +190,8 @@ docker push $USER_NAME/prometheus
 ```
 Как проверить работоспособность:
 -  В адресной строке браузера перейти по:
-`http://docker-host-ip-address-in-GCP:9292` - для просмотра Prometheus
-`http://docker-host-ip-address-in-GCP:9090` - для просмотра Reddit
+`http://docker-host-ip-address-in-GCP:9292` - для просмотра Reddit
+`http://docker-host-ip-address-in-GCP:9090` - для просмотра Prometheus
 
 Ссылки на образы в DockerHub:
 `https://hub.docker.com/r/zombrox/ui/`
