@@ -62,8 +62,8 @@ docker push $USER_NAME/prometheus
 ```
 Как проверить работоспособность:
 -  В адресной строке браузера перейти по:
-`http://docker-host-ip-address-in-GCP:9292` - для просмотра Prometheus
-`http://docker-host-ip-address-in-GCP:9090` - для просмотра Reddit
+`http://docker-host-ip-address-in-GCP:9292` - для просмотра Reddit
+`http://docker-host-ip-address-in-GCP:9090` - для просмотра Prometheus
 
 Ссылки на образы в DockerHub:
 `https://hub.docker.com/r/zombrox/ui/`
