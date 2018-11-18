@@ -5,9 +5,46 @@ Homework #20
 
 Что сделано :
 -
+for i in ui post-py comment; do cd src/$i; bash docker_build.sh; cd -; done
+
 
 Как запустить проект:
--
+1 )
+`for i in ui comment; do cd src/$i; bash docker_build.sh && docker push $USER_NAME/$i; cd -; done`
+`for i in post; do cd src/post-py; bash docker_build.sh && docker push $USER_NAME/$i; cd -; done`
+
+2)
+export GOOGLE_PROJECT=docker-zombrox
+
+docker-machine create --driver google \
+--google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
+--google-machine-type n1-standard-1 \
+--google-open-port 5601/tcp \
+--google-open-port 9292/tcp \
+--google-open-port 9411/tcp \
+logging
+
+eval $(docker-machine env logging)
+
+docker-machine ip logging
+
+`docker-machine ssh logging sudo sysctl -w vm.max_map_count=262144` - без этой опции не работает elasticsearch
+
+3)
+export USER_NAME=zombrox
+cd logging/fluentd/
+docker build -t $USER_NAME/fluentd .
+
+3.5)
+
+docker-compose -f docker-compose-logging.yml up -d
+
+4)
+cd src/
+docker-compose up -d
+docker-compose logs -f post 
+
+
 
 Как проверить работоспособность:
 -
