@@ -36,13 +36,6 @@ services:
       - post_db:/data/db
     networks:
       - back_net
-
-  comment_db:
-    image: mongo:3.2
-    volumes:
-      - comment_db:/data/db
-    networks:
-      - back_net
      
   ui:
 #    build: ./ui
@@ -69,7 +62,6 @@ services:
 volumes:
   prometheus_data:
   post_db:
-  comment_db:
 
 networks:
   back_net:

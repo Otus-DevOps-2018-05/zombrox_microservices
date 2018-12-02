@@ -1,6 +1,80 @@
 # zombrox_microservices
 zombrox microservices repository
 
+Homework #18
+
+Что сделано :
+- создан Dockerfile для Prometheus
+- содан файл конфигурации prometheus.yml
+- Создан образ с Prometheus
+- В docker-compose.yml добавлено описание сервисов с Prometheus и node-exporter
+- Образы сервисов пересобраны для добавления healthcheck
+- Reddit и Prometheus запущены на docker-host при помощи docker-compose
+- Образы сервисов запушены на DockerHub
+
+Как запустить проект:
+1) Создаем правила файрвола
+```
+gcloud compute firewall-rules create prometheus-default --allow tcp:9090
+gcloud compute firewall-rules create puma-default --allow tcp:9292
+```
+2) Создадим Docker host
+
+`export GOOGLE_PROJECT=docker-zombrox`
+```
+docker-machine create --driver google \
+--google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
+--google-machine-type n1-standard-1 \
+--google-zone asia-east2-a \
+docker-host
+```
+`eval $(docker-machine env docker-host)`
+
+3) Запустим контейнер с Prometheus
+`docker run --rm -p 9090:9090 -d --name prometheus prom/prometheus:v2.1.0`
+
+`docker ps` - посмотреть что запустилось
+
+`docker-machine ip docker-host` - узнать ip адрес хоста
+
+`docker stop prometheus` - остановить контейнер с Prometheus
+
+4) Собираем Docker образ
+`cd monitoring/prometheus/`
+`export USER_NAME=zombrox`
+`docker build -t $USER_NAME/prometheus .`
+
+5) Собираем образы микросервисов (запускать находясь в корне репозитория)
+`for i in ui post-py comment; do cd src/$i; bash docker_build.sh; cd -; done`
+
+7) Запускаем микросевисы про помощи docker-compose
+`cd src/`
+`docker-compose up -d`
+
+8) Пушим собранные образы на DockerHub
+`docker login`
+Login Succeeded
+```
+docker push $USER_NAME/ui
+docker push $USER_NAME/comment
+docker push $USER_NAME/post
+docker push $USER_NAME/prometheus
+```
+Как проверить работоспособность:
+-  В адресной строке браузера перейти по:
+`http://docker-host-ip-address-in-GCP:9292` - для просмотра Reddit
+`http://docker-host-ip-address-in-GCP:9090` - для просмотра Prometheus
+
+Ссылки на образы в DockerHub:
+`https://hub.docker.com/r/zombrox/ui/`
+`https://hub.docker.com/r/zombrox/comment/`
+`https://hub.docker.com/r/zombrox/post/`
+`https://hub.docker.com/r/zombrox/prometheus/`
+
+Cсылка на весь репозиторий в DockerHub - `https://hub.docker.com/u/zombrox/`
+
+##############################################################################
+
 Homework #17
 
 Что сделано :
