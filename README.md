@@ -1,6 +1,134 @@
 # zombrox_microservices
 zombrox microservices repository
 
+Homework #20
+
+Что сделано :
+- Cоздан отдельный compose-файл для компонентов EFK.
+- Создан образ контейнера с fluentd.
+- Пересобраны образы контейнеров с обновленным кодом Reddit.
+- В конфигурацию fluentd добавлены фильтры для работы со сруктурированными и не структрурированными логами.
+
+
+
+Как запустить проект:
+1 ) Соберем образы микросевисов приложения с обновленным кодом
+`export USER_NAME=zombrox`
+`for i in ui comment; do cd src/$i; bash docker_build.sh && docker push $USER_NAME/$i; cd -; done`
+`for i in post; do cd src/post-py; bash docker_build.sh && docker push $USER_NAME/$i; cd -; done`
+
+2) Создадим docker-host
+`export GOOGLE_PROJECT=docker-zombrox`
+
+```
+docker-machine create --driver google \
+--google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
+--google-machine-type n1-standard-1 \
+--google-open-port 5601/tcp \
+--google-open-port 9292/tcp \
+--google-open-port 9411/tcp \
+logging
+```
+`eval $(docker-machine env logging)`
+
+`docker-machine ip logging` - узнаем ip адрес docker-host
+
+`docker-machine ssh logging sudo sysctl -w vm.max_map_count=262144` - без этой опции не работает elasticsearch
+
+3)Соберем образ с fluentd
+`export USER_NAME=zombrox`
+`cd logging/fluentd/`
+`docker build -t $USER_NAME/fluentd .`
+
+4)Запустим микросервисы EFK и reddit
+`cd docker/`
+`docker-compose -f docker-compose-logging.yml up -d`
+`docker-compose up -d`
+
+Как проверить работоспособность:
+-  В адресной строке браузера перейти по:
+`http://docker-host-ip-address-in-GCP:9292` - для перехода к Reddit
+`http://docker-host-ip-address-in-GCP:5601` - для перехода к Kibana
+
+`docker-compose logs -f <container-name>` - посмотреть логи в контейнере
+
+##############################################################################
+
+Homework #19
+
+Что сделано :
+- Микросервисы разделены на разные docker-compose файлы. На мониторинг и приложение.
+- добавлен запуск контейнера с cAdvisor
+- в Prometheus добавлен сбор метрик с cAdvisor
+- добавлен запуск контейнера с Grafana
+- в Grafana добавлен Prometheus в качестве data source
+- В Grafana добвлены Dashboards для визуализации метрик контейнеров, приложений, счетчиков постов и коментариев
+- добавлен запуск контейнера с alertmanager для отправки сообщений о сбоях в slack канал
+
+Как запустить проект:
+
+1) Создадим Docker host
+
+`export GOOGLE_PROJECT=docker-zombrox`
+```
+docker-machine create --driver google \
+--google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
+--google-machine-type n1-standard-1 \
+--google-zone asia-east2-a \
+docker-host
+```
+`eval $(docker-machine env docker-host)`
+`docker-machine ip docker-host` - получаем ip адрес docker-host
+
+2) Собираем Docker образы с Prometheus и Alertmanager
+
+`export USER_NAME=zombrox`
+
+`cd monitoring/prometheus/`
+`docker build -t $USER_NAME/prometheus .`
+
+`cd monitoring/alertmanager/`
+`docker build -t $USER_NAME/alertmanager .`
+
+3) Добавляем необходимые правила файрвола
+
+`gcloud compute firewall-rules create cadvisor-default --allow tcp:9090`
+`gcloud compute firewall-rules create grafana-default --allow tcp:3000`
+`gcloud compute firewall-rules create alertmanager-default --allow tcp:9093`
+
+4) Запустим сервисы
+`cd src/` 
+`docker-compose up -d`
+`docker-compose -f docker-compose-monitoring.yml up -d`
+
+5) Добавляем в Grafana Data Sources
+`http://docker-host-ip:3000/datasources/new`
+Используем при этом `http://prometheus:9090` как URL
+
+6) импортируем Dashboards из `monitoring/grafana/dashboards/`
+`http://docker-host-ip:3000/dashboard/import`
+необходимо будет указать Prometheus Server (единственный в выпадающем списке)
+
+7) Пушим собранные образы на DockerHub
+`docker login`
+Login Succeeded
+`docker push $USER_NAME/ui`
+`docker push $USER_NAME/comment`
+`docker push $USER_NAME/post`
+`docker push $USER_NAME/prometheus`
+`docker push $USER_NAME/alertmanager`
+
+
+Как проверить работоспособность:
+-  В адресной строке браузера перейти по:
+`http://docker-host-ip-address-in-GCP:9292` - для перехода к Reddit
+`http://docker-host-ip-address-in-GCP:9090` - для перехода к Prometheus
+`http://docker-host-ip-address-in-GCP:3000` - для перехода к Grafana
+`http://docker-host-ip-address-in-GCP:9093` - для перехода к Alertmanager
+`http://docker-host-ip-address-in-GCP:8080` - для перехода к cAdvisor
+
+##############################################################################
+
 Homework #18
 
 Что сделано :

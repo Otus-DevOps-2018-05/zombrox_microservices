@@ -5,7 +5,6 @@ GEM
     bson_ext (1.5.1)
     et-orbi (1.0.8)
       tzinfo
-    json (2.1.0)
     mongo (2.4.3)
       bson (>= 4.2.1, < 5.0.0)
     mustermann (1.0.2)
@@ -33,13 +32,12 @@ PLATFORMS
 
 DEPENDENCIES
   bson_ext
-  json
   mongo
   prometheus-client
   puma
   rack
   rufus-scheduler
-  sinatra (~> 2.0.1)
+  sinatra (~> 2.0.2)
 
 BUNDLED WITH
    1.16.1
